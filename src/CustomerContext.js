@@ -42,9 +42,7 @@ export function CustomerProvider({ children }) {
 	
 	function sortOnClick() {
 
-		setIsSorting(!isSorting);
-		
-		console.log('click kiye',isSorting)
+		setIsSorting(prevIsSoting => !prevIsSoting);
 		
 	}
 	useEffect(() => {
@@ -85,25 +83,18 @@ export function CustomerProvider({ children }) {
 			.catch(function (error) {
 			  console.log(error);
 			})
+			
 	},[isMax])
 
 	useEffect(() => {
 		
-		setFilteredCustomers(filteredCustomers.map(filteredCustomer => ({
-			
-			...filteredCustomer,
-			sorted : 'sss',
-			
-		})))
-
-		// setFilteredCustomers(filteredCustomers);
-		
-		console.log(filteredCustomers)
 		if(isSorting === false) {
-			setFilteredCustomers(filteredCustomers.sort((a,b) => a.bids - b.bids));
+			
+			setFilteredCustomers(filteredCustomers.slice(0).sort((a,b) => a.bids - b.bids));
 		}
 		else {
-			setFilteredCustomers(filteredCustomers.sort((a,b) => b.bids - a.bids));
+			
+			setFilteredCustomers(filteredCustomers.slice(0).sort((a,b) => b.bids - a.bids));
 		}
 	},[isSorting])
 

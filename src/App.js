@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from 'react';
+import React,{useState} from 'react';
 import './App.css';
 import TableView from './Components/TableView';
 import { makeStyles } from '@material-ui/core/styles';
@@ -42,7 +42,7 @@ function App() {
     setCustomerId(customerID);
   }
   const classes = useStyles();
-  console.log(customers);
+
   return (
     <Router>
     <div className="App container mt-5">
