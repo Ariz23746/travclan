@@ -1,4 +1,4 @@
-import React,{useContext} from 'react';
+import React,{useContext,useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -34,6 +34,7 @@ function TableView({ customers }) {
 
   const classes = useStyles();
   const isMax = useContext(CustomerContext);
+
   return (
     
     <TableContainer component={Paper} stickyHeader aria-label="sticky table">
