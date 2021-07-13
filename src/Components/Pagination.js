@@ -9,10 +9,10 @@ function Pagination({ totalCustomer, customerPerPage, changeCustomer}) {
 	}
 	return (
 		<nav aria-label="Page navigation example" className="mt-2">
-			<ul class="pagination">
+			<ul className="pagination">
 				
 				{pageNumbers.map(number => (
-					<li class="page-item">
+					<li key={number} className="page-item">
 						<a onClick={() => changeCustomer(number)} class="page-link" href="#!">{number}</a>
 					</li>
 				))}

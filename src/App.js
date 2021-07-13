@@ -1,37 +1,35 @@
 import React,{useState,useEffect} from 'react';
-import Button from '@material-ui/core/Button';
-import axios from 'axios';
 import './App.css';
 import TableView from './Components/TableView';
-import { CustomerContext } from './CustomerContext';
+import { makeStyles } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 import Pagination from './Components/Pagination';
+import {BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { useFilteredCustomer,useLoading } from './CustomerContext';
+import Bids from "./Components/Bids";
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+    height: 100,
+    alignItems: 'center',
+    marginTop: 5,
+    justifyContent: 'center',
+    '& > * + *': {
+      marginLeft: theme.spacing(1),
+    },
+  },
+}));
 
 
 function App() {
 
-  const [customers, setCustomers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isMax,setMax] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [customersPerPage] = useState(5);
-  
-
-  
-  useEffect(() => {
-
-    axios.get('https://intense-tor-76305.herokuapp.com/merchants')
-    .then((res) => {
-      setLoading(false);
-      setCustomers(res.data);
-    })
-    .catch(function (error) {
-      console.log(error);
-    })
-  },[])
-
-  function toggleIsMax() {
-    setMax(isMax => !isMax);
-  }
+  const [customerId,setCustomerId] = useState("");
+  const customers = useFilteredCustomer();
+  const loading = useLoading();
   const lastIndexOfCustomer = currentPage * customersPerPage;
   const firstIndexOfCustomer = lastIndexOfCustomer - customersPerPage;
   const currentCustomers = customers.slice(firstIndexOfCustomer,lastIndexOfCustomer);
@@ -39,33 +37,41 @@ function App() {
   const changeCustomer = (number) => {
     setCurrentPage(number);
   }
+
+  const getId = (customerID) => {
+    setCustomerId(customerID);
+  }
+  const classes = useStyles();
+  console.log(customers);
   return (
-
-    <div className="App">
-      <h1>TravClan Frontend Test</h1>
-      { loading 
-        ? 
-          <h3>loading customers .. </h3>
-        :
-        <CustomerContext.Provider value={isMax}>
-        <div className="App__ButtonContainer">
-          <Button onClick={() => {
-            // sortCustomers();
-            
-          }} variant="outlined" color="primary">
-            Sort According to Bid Price
-          </Button>
-          <Button onClick={() => toggleIsMax()} variant="outlined" color="secondary">
-            {isMax ? "Min Bid" : "Max Bid"}
-          </Button>
-        </div>
-        <TableView customers={currentCustomers}/>
-        <Pagination totalCustomer={customers.length} customerPerPage={customersPerPage} changeCustomer={changeCustomer} />
-      </CustomerContext.Provider>
-
-      }
+    <Router>
+    <div className="App container mt-5">
+      <Switch>
+        <Route exact path="/">
+          <h1>TravClan Frontend Test</h1>
+          { loading 
+            ? 
+            <div className="container">
+              <h5 className="mt-3">loading customers .. </h5>
+              <div className={classes.root}>
+                
+                <CircularProgress color="secondary" />
+              </div>
+            </div>
+            :
+            <>
+              <TableView customers={currentCustomers} getId={getId}/>
+              <Pagination totalCustomer={customers.length} customerPerPage={customersPerPage} changeCustomer={changeCustomer} /> 
+            </>
+          }
+        </Route>
+        <Route exact path={`/${customerId}`}>
+          <Bids customerId={customerId} />
+        </Route>
+        </Switch>
+      </div>
       
-    </div>
+    </Router>
   );
 }
 

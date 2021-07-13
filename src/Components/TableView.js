@@ -1,4 +1,5 @@
-import React,{useContext,useState} from 'react';
+import React from 'react';
+import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -7,8 +8,8 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { CustomerContext } from '../CustomerContext';
-
+import { useMax, useToggleMax, useSortContext } from '../CustomerContext';
+import { Link } from "react-router-dom";
 const useStyles = makeStyles({
   table: {
     minWidth: 650,
@@ -23,21 +24,35 @@ const useStyles = makeStyles({
     justifyContent: 'flex-start',
     alignItems: 'center'
   },
+  a: {
+    textDecoration:'none',
+  },
   spanStyle: {
     flex: 0.6,
   },
 });
 
 
-function TableView({ customers }) {
+function TableView({ customers, getId }) {
 
 
   const classes = useStyles();
-  const isMax = useContext(CustomerContext);
-
+  const isMax = useMax();
+  const toggleIsMax = useToggleMax();
+  const sortContext = useSortContext();
   return (
-    
-    <TableContainer component={Paper} stickyHeader aria-label="sticky table">
+    <>
+     <div className="App__ButtonContainer">
+          <Button onClick={() => {
+            sortContext();
+          }} variant="outlined" color="primary">
+            Sort According to Bid Price
+          </Button>
+          <Button onClick={toggleIsMax} variant="outlined" color="secondary">
+            {isMax ? "Min Bid" : "Max Bid"}
+          </Button>
+        </div>
+    <TableContainer component={Paper} aria-label="sticky table">
       <Table className={classes.table} aria-label="simple table">
         <TableHead>
           <TableRow className={classes.header}>
@@ -50,8 +65,8 @@ function TableView({ customers }) {
         </TableHead>
         <TableBody>
           {customers.map((customer) => (
-            
-            <TableRow key={customer.id}>
+         
+            <TableRow key={customer.id} component={Link} to={`/${customer.id}`} className={classes.a} onClick={() => getId(customer.id)} >
               <TableCell className={classes.rowStyle}component="th" scope="row">
                 <span className={classes.spanStyle}>{customer.firstname}</span>
                 <img alt={customer.lastname} className={classes.imgStyle} src={customer.avatarUrl} height="30" width="30" />
@@ -59,26 +74,14 @@ function TableView({ customers }) {
               <TableCell align="right">{customer.email}</TableCell>
               <TableCell align="right">{customer.phone}</TableCell>
               <TableCell align="right">{customer.hasPremium ? "True" : "False"}</TableCell>
-              <TableCell align="right">{
-                
-                isMax ? 
-                  (Math.max(...customer.bids.map(bid => bid.amount)) === -Infinity 
-                    ? NaN 
-                    : Math.max(...customer.bids.map(bid => bid.amount))
-                  ) 
-                  :
-                  (Math.min(...customer.bids.map(bid => bid.amount)) === Infinity 
-                    ? NaN 
-                    : Math.min(...customer.bids.map(bid => bid.amount))
-                  )
-              }
-              </TableCell>
+              <TableCell align="right">{customer.bids}</TableCell>
             </TableRow>
+      
           ))}
         </TableBody>
       </Table>
     </TableContainer>
-    
+    </>
   );
 }
 
